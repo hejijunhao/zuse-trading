@@ -52,13 +52,17 @@ engine = create_engine(
     DATABASE_URL,
     poolclass=NullPool,      # Let pgBouncer handle all pooling
     pool_pre_ping=True,      # Still verify connections before use
-    echo=settings.DEBUG      # Log SQL queries when DEBUG=true
+    echo=settings.DEBUG,     # Log SQL queries when DEBUG=true
+    connect_args={
+        "prepare_threshold": None  # Disable prepared statements for pgBouncer transaction mode
+    }
 )
 
 logger.info("Database engine configured with:")
 logger.info(f"  - Pooling: NullPool (delegated to pgBouncer)")
 logger.info(f"  - Health checks: Enabled (pool_pre_ping=True)")
 logger.info(f"  - SQL echo: {settings.DEBUG}")
+logger.info(f"  - Prepared statements: Disabled (pgBouncer compatibility)")
 
 # Create sessionmaker with expire_on_commit=False
 # This prevents automatic refresh after commit, giving us explicit control

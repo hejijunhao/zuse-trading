@@ -6,3 +6,9 @@ python-dotenv==1.0.1
 sqlmodel==0.0.22
 psycopg[binary]==3.2.3
 alembic==1.13.2
+
+# Data fetching for universe seeding
+yfinance>=0.2.40
+pandas>=2.0.0
+lxml>=4.9.0
+requests>=2.31.0

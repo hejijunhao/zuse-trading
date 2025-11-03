@@ -2,7 +2,6 @@
 
 from datetime import datetime
 from typing import Optional
-from uuid import UUID
 from sqlmodel import SQLModel, Field, Column
 from sqlalchemy.dialects.postgresql import JSONB
 from .mixins import UUIDMixin
