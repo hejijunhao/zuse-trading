@@ -1,0 +1,1 @@
+Begin by looking at the CLAUDE.md file, README.md file, and our docs/changelog/changelog.md file to familiarise yourself with our application.

@@ -4,6 +4,7 @@ from datetime import date, datetime
 from typing import Optional
 from uuid import UUID
 from sqlmodel import SQLModel, Field, Column, Relationship
+from sqlalchemy import UniqueConstraint, Index
 from sqlalchemy.dialects.postgresql import JSONB
 from .mixins import UUIDMixin
 
@@ -27,6 +28,13 @@ class CompanySnapshot(SQLModel, UUIDMixin, table=True):
     # Relationships
     instrument: Optional["Instrument"] = Relationship()  # type: ignore
     data_source: Optional["DataSource"] = Relationship()  # type: ignore
+
+    __table_args__ = (
+        # Unique constraint: one snapshot per instrument per day
+        UniqueConstraint("instrument_id", "snapshot_date", name="uq_company_snapshot_instrument_date"),
+        # Composite index for time-series queries (most recent first)
+        Index("ix_company_snapshot_instrument_date_desc", "instrument_id", "snapshot_date", postgresql_ops={"snapshot_date": "DESC"}),
+    )
 
 
 # Import at the bottom to avoid circular imports

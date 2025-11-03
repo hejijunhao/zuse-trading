@@ -4,6 +4,7 @@ from datetime import date, datetime
 from typing import Optional
 from uuid import UUID
 from sqlmodel import SQLModel, Field, Column, Relationship
+from sqlalchemy import UniqueConstraint
 from sqlalchemy.dialects.postgresql import JSONB
 from .mixins import UUIDMixin
 
@@ -23,6 +24,11 @@ class AnalystEstimate(SQLModel, UUIDMixin, table=True):
     # Relationships
     instrument: Optional["Instrument"] = Relationship()  # type: ignore
     data_source: Optional["DataSource"] = Relationship()  # type: ignore
+
+    __table_args__ = (
+        # Unique constraint: one estimate per instrument/date/period combination
+        UniqueConstraint("instrument_id", "as_of_date", "target_period", name="uq_analyst_estimate_instrument_period"),
+    )
 
 
 # Import at the bottom to avoid circular imports

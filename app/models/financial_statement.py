@@ -4,6 +4,7 @@ from datetime import date, datetime
 from typing import Optional
 from uuid import UUID
 from sqlmodel import SQLModel, Field, Column, Relationship
+from sqlalchemy import UniqueConstraint, Index
 from sqlalchemy.dialects.postgresql import JSONB
 from .mixins import UUIDMixin
 
@@ -26,6 +27,13 @@ class FinancialStatement(SQLModel, UUIDMixin, table=True):
     # Relationships
     instrument: Optional["Instrument"] = Relationship()  # type: ignore
     data_source: Optional["DataSource"] = Relationship()  # type: ignore
+
+    __table_args__ = (
+        # Unique constraint to prevent duplicate statements
+        UniqueConstraint("instrument_id", "period_end", "period_type", name="uq_financial_instrument_period"),
+        # Composite index for time-series queries (most recent first)
+        Index("ix_financial_instrument_period_desc", "instrument_id", "period_end", postgresql_ops={"period_end": "DESC"}),
+    )
 
 
 # Import at the bottom to avoid circular imports

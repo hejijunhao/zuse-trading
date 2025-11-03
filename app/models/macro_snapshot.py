@@ -4,6 +4,7 @@ from datetime import date, datetime
 from typing import Optional
 from uuid import UUID
 from sqlmodel import SQLModel, Field, Column, Relationship
+from sqlalchemy import UniqueConstraint
 from sqlalchemy.dialects.postgresql import JSONB
 from .mixins import UUIDMixin
 
@@ -22,6 +23,11 @@ class MacroSnapshot(SQLModel, UUIDMixin, table=True):
 
     # Relationships
     data_source: Optional["DataSource"] = Relationship()  # type: ignore
+
+    __table_args__ = (
+        # Unique constraint: one snapshot per region per day
+        UniqueConstraint("region", "snapshot_date", name="uq_macro_snapshot_region_date"),
+    )
 
 
 # Import at the bottom to avoid circular imports

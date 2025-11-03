@@ -5,6 +5,7 @@ from decimal import Decimal
 from typing import Optional
 from uuid import UUID
 from sqlmodel import SQLModel, Field, Relationship
+from sqlalchemy import CheckConstraint, UniqueConstraint, Index
 from .mixins import UUIDMixin
 
 
@@ -28,6 +29,18 @@ class OHLCVBar(SQLModel, UUIDMixin, table=True):
     # Relationships
     instrument: Optional["Instrument"] = Relationship()  # type: ignore
     data_source: Optional["DataSource"] = Relationship()  # type: ignore
+
+    __table_args__ = (
+        # OHLCV validation constraints
+        CheckConstraint("high >= low", name="check_ohlcv_high_low"),
+        CheckConstraint("high >= open AND high >= close", name="check_ohlcv_high_bounds"),
+        CheckConstraint("low <= open AND low <= close", name="check_ohlcv_low_bounds"),
+        CheckConstraint("volume >= 0", name="check_volume_positive"),
+        # Unique constraint to prevent duplicate bars
+        UniqueConstraint("instrument_id", "ts", "data_source_id", name="uq_ohlcv_instrument_ts_source"),
+        # Composite index for time-series queries (most recent first)
+        Index("ix_ohlcv_instrument_ts_desc", "instrument_id", "ts", postgresql_ops={"ts": "DESC"}),
+    )
 
     class Config:
         json_schema_extra = {
