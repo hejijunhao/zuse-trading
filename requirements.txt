@@ -15,3 +15,8 @@ requests>=2.31.0
 
 # Financial data APIs
 openbb>=4.0.0
+
+# Data pipeline
+aiohttp>=3.9.0            # Async HTTP for parallel fetching
+tenacity>=8.2.0           # Retry logic with exponential backoff
+googlenewsdecoder>=0.1.0  # Google News URL resolution
